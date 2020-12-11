@@ -1,6 +1,6 @@
 import contextlib
 
-import oppai
+from pp.oppai_ng import oppai
 
 from common.constants import gameModes, mods
 from common.log import logUtils as log
