@@ -6,6 +6,7 @@ import os
 import sys
 import threading
 import traceback
+from urllib.parse import urlencode
 
 import requests
 import tornado.gen
@@ -466,6 +467,7 @@ class handler(requestsManager.asyncRequestHandler):
 				newScoreboard = scoreboard.scoreboard(username, s.gameMode, beatmapInfo, False, relax=s.isRelax)
 				newScoreboard.setPersonalBestRank()
 				personalBestID = newScoreboard.getPersonalBestID()
+
 				assert personalBestID is not None
 				currentPersonalBest = score.score(personalBestID, newScoreboard.personalBestRank)
 
@@ -543,9 +545,11 @@ class handler(requestsManager.asyncRequestHandler):
 						gameModes.getGamemodeFull(s.gameMode),
 						"relax" if s.isRelax else "classic"
 					)
-					fokaM = None
+
+					params = urlencode({"k": glob.conf["BANCHO_API_KEY"], "to": "#announce-relax" if s.isRelax else "#announce", "msg": annmsg})
+
 					try:
-						fokabot.message(annmsg, "#announce-relax" if s.isRelax else "#announce")
+						requests.get("{}/api/v1/fokabotMessage?{}".format(glob.conf["BANCHO_URL"], params))
 					except requests.Timeout as e:
 						fokaM ="FokaBot #1 timeout."
 					except requests.ConnectionError as e:
