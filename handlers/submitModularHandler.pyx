@@ -303,47 +303,14 @@ class handler(requestsManager.asyncRequestHandler):
 					# Save the replay if it was provided
 					log.debug("Saving replay ({}) locally".format(s.scoreID))
 					replay = self.request.files["score"][0]["body"]
-
-
 					replayFileName = "replay_{}.osr".format(s.scoreID)
-
-					@timeout(5, use_signals=False)
-					def s3Upload():
-						log.info("Uploading {} -> S3 write Bucket".format(replayFileName))
-						with io.BytesIO() as f:
-							f.write(replay)
-							f.seek(0)
-							glob.threadScope.s3.upload_fileobj(f, s3.getWriteReplayBucketName(), replayFileName)
-						glob.db.execute(
-							"UPDATE s3_replay_buckets SET `size` = `size` + 1 WHERE max_score_id IS NULL LIMIT 1"
-						)
-						log.debug("{} has been uploaded to S3".format(replayFileName))
 
 					def saveLocally(folder):
 						log.debug("Saving {} locally in {}".format(replayFileName, folder))
 						with open(os.path.join(folder, replayFileName), "wb") as f:
 							f.write(replay)
-
-					def replayUploadBgWork():
-						log.debug("Started replay uplaod background job")
-						ok = False
-						try:
-							s3Upload()
-							ok = True
-						except Exception as e:
-							m = "Error while uploading replay to S3 ({}). Saving in failed replays folder.".format(e)
-							log.error(m)
-							saveLocally(glob.conf["FAILED_REPLAYS_FOLDER"])
-							glob.stats["replay_upload_failures"].inc()
-							sentry.captureMessage(m)
-						finally:
-							log.debug("Replay upload background job finished. ok = {}".format(ok))
-
+							
 					saveLocally(glob.conf["REPLAYS_FOLDER"])
-					if glob.conf.s3_enabled:
-						threading.Thread(target=replayUploadBgWork, daemon=False).start()
-					else:
-						log.warning("S3 Replays upload disabled! Only saving locally.")
 
 					# Send to cono ALL passed replays, even non high-scores
 					if glob.conf["CONO_ENABLE"]:
@@ -535,7 +502,7 @@ class handler(requestsManager.asyncRequestHandler):
 				# send message to #announce if we're rank #1
 				if newScoreboard.personalBestRank == 1 and s.completed == 3 and not restricted:
 					annmsg =\
-						"[https://ripple.moe/?u={} {}] " \
+						"[https://osu.vortex-tds.studio/?u={} {}] " \
 						"achieved rank #1 on " \
 						"[https://osu.ppy.sh/b/{} {}] ({}, {})".format(
 						userID,
@@ -547,18 +514,7 @@ class handler(requestsManager.asyncRequestHandler):
 					)
 
 					params = urlencode({"k": glob.conf["BANCHO_API_KEY"], "to": "#announce-relax" if s.isRelax else "#announce", "msg": annmsg})
-
-					try:
-						requests.get("{}/api/v1/fokabotMessage?{}".format(glob.conf["BANCHO_URL"], params))
-					except requests.Timeout as e:
-						fokaM ="FokaBot #1 timeout."
-					except requests.ConnectionError as e:
-						fokaM = "FokaBot #1 connection error."
-					finally:
-						if fokaM is not None:
-							log.error(fokaM)
-							sentry.captureMessage(fokaM)
-
+					requests.get("{}/api/v1/fokabotMessage?{}".format(glob.conf["BANCHO_URL"], params))
 				# Write message to client
 				self.write(output)
 			else:
