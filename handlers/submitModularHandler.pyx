@@ -515,7 +515,7 @@ class handler(requestsManager.asyncRequestHandler):
 						"relax" if s.isRelax else "classic"
 					)
 					log.info("Announcing the score")
-					params = urlencode({"k": glob.conf["BANCHO_API_KEY"], "to": "#announce-relax" if s.isRelax else "#announce", "msg": annmsg})
+					params = urlencode({"k": glob.conf["BANCHO_API_KEY"], "to": "#announce", "msg": annmsg})
 					requests.get("{}/api/v1/fokabotMessage?{}".format(glob.conf["BANCHO_URL"], params))
 				# Write message to client
 				self.write(output)
