@@ -77,6 +77,7 @@ def make_app():
 
 		(r"/p/verify", redirectHandler.handler, dict(destination="https://osu.vortex-tds.studio/index.php?p=2")),
 		(r"/u/(.*)", redirectHandler.handler, dict(destination="https://osu.vortex-tds.studio/index.php?u={}")),
+		(r"/b/(.*)", redirectHandler.handler, dict(destination="https://osu.vortex-tds.studio/b/{}")),
 
 		(r"/api/v1/status", apiStatusHandler.handler),
 		(r"/api/v1/pp", apiPPHandler.handler),
