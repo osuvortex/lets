@@ -237,15 +237,13 @@ class score:
 		Set this score completed status and rankedScoreIncrease
 		"""
 		try:
+			userID = userUtils.getID(self.playerName)
 			self.completed = 0
 			if not scoreUtils.isRankable(self.mods):
 				log.debug("Unrankable mods")
 				return
 			if self.passed:
 				log.debug("Passed")
-				# Get userID
-				userID = userUtils.getID(self.playerName)
-
 				# Make sure we don't have another score identical to this one
 				# This is problematic, consider removing it entirely,
 				# a few duplicate rows aren't going to hurt anyone

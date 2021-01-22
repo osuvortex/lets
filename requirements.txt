@@ -1,4 +1,3 @@
--i https://p.nyodev.xyz
 tornado==4.4.2
 progressbar2==3.38.0
 raven==5.32.0
@@ -13,5 +12,4 @@ boto3==1.9.169
 timeout-decorator==0.4.1
 pymysql==0.9.3
 pymysql-pool==0.3.3
-oppai==103.3.3
 prometheus-client==0.8.0
