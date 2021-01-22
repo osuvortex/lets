@@ -295,9 +295,42 @@ class score:
 						# User prioritizes score, or we have no pp, or we have same pp
 						self.completed = 3 if self.score >= personalBest["score"] else 2
 			elif self.quit:
+				duplicate = glob.db.fetch(
+					"SELECT id FROM scores "
+					"WHERE userid = %s AND beatmap_md5 = %s "
+					"AND is_relax = %s AND play_mode = %s "
+					"AND score = %s AND mods = %s AND `time` >= %s "
+					"LIMIT 1",
+					(
+						userID, self.fileMd5, self.isRelax, self.gameMode,
+						self.score, self.mods, int(time.time()) - 120,
+					)
+				)
+				if duplicate is not None:
+					# Found same score in db. Don't save this score.
+					log.debug("Score duplicate")
+					self.completed = -1
+					return
 				log.debug("Quit")
 				self.completed = 0
+				
 			elif self.failed:
+				duplicate = glob.db.fetch(
+					"SELECT id FROM scores "
+					"WHERE userid = %s AND beatmap_md5 = %s "
+					"AND is_relax = %s AND play_mode = %s "
+					"AND score = %s AND mods = %s AND `time` >= %s "
+					"LIMIT 1",
+					(
+						userID, self.fileMd5, self.isRelax, self.gameMode,
+						self.score, self.mods, int(time.time()) - 120,
+					)
+				)
+				if duplicate is not None:
+					# Found same score in db. Don't save this score.
+					log.debug("Score duplicate")
+					self.completed = -1
+					return
 				log.debug("Failed")
 				self.completed = 1
 		finally:
