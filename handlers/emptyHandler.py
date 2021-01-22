@@ -10,4 +10,6 @@ class handler(requestsManager.asyncRequestHandler):
 	@tornado.web.asynchronous
 	@tornado.gen.engine
 	def asyncGet(self):
-		self.write("Not yet")
+		self.write("Not yet\n")
+	def asyncPost(self):
+		self.write("Not yet\n")
