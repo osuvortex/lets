@@ -356,7 +356,7 @@ class handler(requestsManager.asyncRequestHandler):
 			if s.completed == 3:
 				userAutoLast = userUtils.getAutoLast(userID, s.isRelax)
 				if userAutoLast == autoLast.MESSAGE:
-					annmsg = "Your latest score is worth\n{s.pp:.2f} pp{' (personal best!)' if s.completed == 3 else ''}"
+					annmsg = f"Your latest score is worth\n{s.pp:.2f} pp{' (personal best!)' if s.completed == 3 else ''}"
 					params = urlencode({"k": glob.conf["BANCHO_API_KEY"], "to": username, "msg": annmsg})
 					requests.get("{}/api/v1/fokabotMessage?{}".format(glob.conf["BANCHO_URL"], params))
 				elif userAutoLast == autoLast.NOTIFICATION:
@@ -514,7 +514,7 @@ class handler(requestsManager.asyncRequestHandler):
 						gameModes.getGamemodeFull(s.gameMode),
 						"relax" if s.isRelax else "classic"
 					)
-
+					log.info("Announcing the score")
 					params = urlencode({"k": glob.conf["BANCHO_API_KEY"], "to": "#announce-relax" if s.isRelax else "#announce", "msg": annmsg})
 					requests.get("{}/api/v1/fokabotMessage?{}".format(glob.conf["BANCHO_URL"], params))
 				# Write message to client
